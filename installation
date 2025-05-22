@@ -1,0 +1,53 @@
+#!bin/bash
+# Platform: Ubuntu in WSL2, miniforge with python3.12, cuda 11.8
+# cuda path is needed, python path is also needed
+# verify cuda version
+  # check conda environments and make sure conda is deactivated
+conda info --envs
+conda deactivate
+nvcc --version
+  # log
+nvcc: NVIDIA (R) Cuda compiler driver
+Copyright (c) 2005-2022 NVIDIA Corporation
+Built on Wed_Sep_21_10:33:58_PDT_2022
+Cuda compilation tools, release 11.8, V11.8.89
+Build cuda_11.8.r11.8/compiler.31833905_0
+
+  # get your cuda path
+ls /usr/local/cuda-11.8
+  # check log that it is cuda executable path
+
+# Install from source
+  # Clone this repository and cd inside
+git clone https://github.com/rsanchezgarc/deepEMhancer
+cd deepEMhancer
+
+  # Create a conda environment with the required dependencies
+conda env create -f deepEMhancer_env.yml  -n deepEMhancer_env
+
+  # Activate the environment. Also activate the environment before executing deepEMhancer
+conda activate deepEMhancer_env
+
+  # Set CUDA LD_LIBRARY_PATH
+conda env config vars set LD_LIBRARY_PATH=${CONDA_PREFIX}/lib/python3.9/site-packages/nvidia/cudnn/lib:${CONDA_PREFIX}/lib/:$LD_LIBRARY_PATH
+conda activate deepEMhancer_env #To make the changes effective
+
+  # Install deepEMhancer
+python -m pip install . --no-deps
+# log
+Looking in indexes: https://pypi.org/simple, https://pypi.ngc.nvidia.com
+Processing /mnt/c/Linux_folder/deepEMhancer
+  Preparing metadata (setup.py) ... done
+Building wheels for collected packages: deepEMhancer
+  Building wheel for deepEMhancer (setup.py) ... done
+  Created wheel for deepEMhancer: filename=deepemhancer-0.16-py3-none-any.whl size=35277 sha256=62958afe7233bdfea7edb0ca870c162b1a6e927656378ee45260bb997f8b9d7c
+  Stored in directory: /tmp/pip-ephem-wheel-cache-gdh8u6d0/wheels/7d/ef/9c/aad6dfd2419dec8faad7ca3ad5bc99c4d09d97bec7e4ad4c7e
+Successfully built deepEMhancer
+Installing collected packages: deepEMhancer
+Successfully installed deepEMhancer-0.16
+
+  # Download our deep learning models
+deepemhancer --download
+# Do not forget to activate the environment for future usages
+# Ref: https://github.com/rsanchezgarc/deepEMhancer
+
