@@ -23,14 +23,32 @@ git clone https://github.com/rsanchezgarc/deepEMhancer
 cd deepEMhancer
 
   # Create a conda environment with the required dependencies
+  # edit to comment out cudatoolkit 11.8 (we will use system wide installed cuda-12.8)
 conda env create -f deepEMhancer_env.yml  -n deepEMhancer_env
 
   # Activate the environment. Also activate the environment before executing deepEMhancer
 conda activate deepEMhancer_env
 
-  # Set CUDA LD_LIBRARY_PATH
-conda env config vars set LD_LIBRARY_PATH=${CONDA_PREFIX}/lib/python3.9/site-packages/nvidia/cudnn/lib:${CONDA_PREFIX}/lib/:$LD_LIBRARY_PATH
-conda activate deepEMhancer_env #To make the changes effective
+  # Tensorflow install to use with cuda 12.8 system wide
+First, check if system cuda & version 12.8 is found
+$which nvcc (should be system cuda home dir)
+$nvcc --version (should get 12.8)
+Then, check which tensorflow is in the the env (it is tensorflow v2.12. minimum 2.15 is needed to work with cuda-12.8)
+$pip show tensorflow (alternative easy way for pip or do the following to find out)
+$python
+$import tensorflow as tf
+$print(tf.__version__)
+$exit()
+
+Uninstall tensorflow 2.12
+$pip uninstall tensorflow
+
+  # Install tensorflow 2.15 
+$pip install --upgrade pip
+$pip install tensorflow==2.15.0
+
+  # Verify that tensorflow is 2.15 (as above) and it gets GPU devices
+$print("GPUs:", tf.config.list_physical_devices("GPU")) [should give device 0.. ]
 
   # Install deepEMhancer
 python -m pip install . --no-deps
